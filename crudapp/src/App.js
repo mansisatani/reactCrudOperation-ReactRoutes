@@ -10,6 +10,7 @@ function App() {
         <Switch>
           <Route exact path="/" component={CrudForm}/>
           <Route path="/login" component={FormList} />
+            <Route path="/:id" component={CrudForm}/>
         </Switch>
       </BrowserRouter>
   );

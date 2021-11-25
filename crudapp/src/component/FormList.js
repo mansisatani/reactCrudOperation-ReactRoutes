@@ -1,101 +1,81 @@
 import React, {useState,useEffect} from 'react'
 // import CrudForm from '../crudFrom'
+import {useHistory} from 'react-router';
 
 export default function FormList() {
-    const returnList=()=>{
-        if(localStorage.getItem("userData") == null)
-            localStorage.setItem("userData",JSON.stringify([]))
-        return JSON.parse(localStorage.getItem("userData"))
-    }
-    const [userDetail, setUserDetail] = useState({
-        fName: '',
-        lName: '',
-        contact: '',
-        email: '',
-        gender: '',
-        errors: {},
-        currentIndex:-1,
-        list:returnList()
-    })
-    // const userData =()=> {
-    //     if (userDetail.currentIndex === -1)
-    //         return {
-    //             Fname: "",
-    //             lName: "",
-    //             Contact: "",
-    //             email: "",
-    //             gender: "male",
-    //             errors: {},
-    //             currentIndex:-1,
-    //             list:returnList()
-    //         }
-    //     else
-    //         return userDetail.list[userDetail.currentIndex]
-    // }
-    //
-    // useEffect((prevProps) => {
-    //     if (prevProps.currentIndex !== userDetail.currentIndex || prevProps.list.length !== userDetail.list.length)
-    //         setUserDetail({ ...userData()})
-    // });
+    const history = useHistory();
 
-    // const onAdd = (data)=>{
-    //     let list = returnList()
-    //     if(userDetail.currentIndex === -1)
-    //         list.push(data)
-    //     else
-    //         list[userDetail.currentIndex]=data
-    //     localStorage.setItem("userData",JSON.stringify(list))
-    //     setUserDetail({list,currentIndex : -1})
-    // }
+    const [userDetail, setUserDetail] = useState([])
 
-    const handleEdit=(index)=>{
+    useEffect(() => {
+        fetchData()
+    }, []);
+
+    const fetchData = () => {
+        setUserDetail(JSON.parse(localStorage.getItem('userData')))
+    };
+
+    const handleEdit = (index, item) => {
+        console.log("index", index)
         console.log("edit Clicked");
-        // setUserDetail({
-        //     currentIndex:index
-        // })
-    }
+        history.push({
+            pathname: `/${index}`,
+            state: {
+                userData: item
+            }
+        })
+    };
 
     const handleDelete=(index)=>{
         console.log("delete clicked");
+        console.log("index",index)
         if(window.confirm("are you sure")){
-            let list=returnList()
-            list.splice(index,1)
-            localStorage.setItem("userData",JSON.stringify(list))
-            setUserDetail({list,currentIndex : -1})
+            userDetail.splice(index,1);
+            localStorage.setItem("userData",JSON.stringify(userDetail));
+            const getData = JSON.parse(localStorage.getItem('userData'));
+            setUserDetail(getData)
         }
-    }
+    };
+
+const handleBack=(e)=>{
+    e.preventDefault();
+    history.push('/');
+};
 
     return (
         <div>
             <h2>User data</h2>
-            <table>
-                <tbody>
+            <table className="app-container">
+            <tbody>
+                <thead>
                     <tr>
-                        <td>First Name</td>
-                        <td>Last Name</td>
-                        <td>Contact</td>
-                        <td>Email</td>
-                        <td>Gender</td>
-                        <td>Edit</td>
-                        <td>Delete</td>
+                        <th>FirstName</th>
+                        <th>LastName</th>
+                        <th>Contact</th>
+                        <th>Email</th>
+                        <th>Gender</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
                     </tr>
-                </tbody>
-                <tbody>
+                </thead>
+                    
                 {
-                    userDetail.list.map((item,index)=>{
+                    userDetail && userDetail.map((item,index)=>{
                         return <tr key={index}>
                             <td>{item.fName}</td>
                             <td>{item.lName}</td>
                             <td>{item.contact}</td>
                             <td>{item.email}</td>
                             <td>{item.gender}</td>
-                            <td><button onClick = {()=>handleEdit(index)}>Edit</button></td>
-                            <td><button onClick = {()=>handleDelete(index)}>Delete</button></td>
+                            <td><button className="btn btn-warning" onClick = {()=>handleEdit(index, item)}>Edit</button></td>
+                            <td><button className="btn btn-danger" onClick={()=>handleDelete(index)}>Delete</button></td>
                         </tr>
                     })
                 }
                 </tbody>
             </table>
+
+            <button onClick={handleBack} className='mx-3 btn btn-primary' style={{fontSize:"1.5rem",alignItems:"left"}}>Back</button>
         </div>
     )
 }
